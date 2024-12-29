@@ -7,15 +7,19 @@ A convenient and quick tool for batch extracting channels from multiple images a
 ## 注意事项 Notes
 
 - 源图片必须为RGB/RGBA格式
+
 The source images must be in RGB/RGBA format.
 
 - 在使用多张图片的通道时，图片的命名必须有相关性，除了输入的关键字不同，关键字前的命名必须是相同的，比如Image_*
+
 When using channels from multiple images, the naming of the images must be related. Except for the different keywords, the naming before the keywords must be the same, such as Image_*.
 
 - 目前只能输出tga格式，但是输入的图片可以是其他格式
+
 Currently, only TGA format can be output, but the input images can be in other formats.
 
 - 输入的图片通道顺序会依次填装进新的图片
+
 The channel order of the input images will be sequentially filled into the new image.
 
 ## 使用方法 Usage
