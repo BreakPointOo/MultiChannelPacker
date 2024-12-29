@@ -194,6 +194,8 @@ if __name__ == '__main__':
         print(i)
         MatchPicList = MatchSourcePic(i,SourcePicTag)
         GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag)
+
+    os.system('pause')
     
     
 
