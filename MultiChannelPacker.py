@@ -172,6 +172,7 @@ if __name__ == '__main__':
     print('\n')
     print('本软件免费开源，禁止商业用途')
     print('使用方法及后续更新请访问作者主页：')
+    print('https://github.com/BreakPointOo/MultiChannelPacker')
     print('-------------------------------------------------')
     SourcePicCount,TargetPicChannelCount = CheckSourcePicCount()
     ChannelOrder,SourcePicTag = GetChannelOrder(SourcePicCount,TargetPicChannelCount)
