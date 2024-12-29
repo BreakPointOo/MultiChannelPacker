@@ -178,20 +178,9 @@ if __name__ == '__main__':
     ChannelOrder,SourcePicTag = GetChannelOrder(SourcePicCount,TargetPicChannelCount)
     SourcePicPath = GetSourcePicPath()
     SourcePicList = GetSourcePicList(SourcePicPath,SourcePicTag[0])
-    # print("SourcePicCount:")
-    # print(SourcePicCount)
-    # print("TargetPicChannelCount:")
-    # print(TargetPicChannelCount)
-    # print("ChannelOrder:")
-    # print(ChannelOrder)
-    # print("SourcePicTag:")
-    # print(SourcePicTag)
-    # print("SourcePicPath:")
-    # print(SourcePicPath)
-    # print("SourcePicList:")
-    # print(SourcePicList)
+
     for i in SourcePicList:
-        print(i)
+
         MatchPicList = MatchSourcePic(i,SourcePicTag)
         GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag)
 
