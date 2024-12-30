@@ -2,6 +2,58 @@ from PIL import Image as PILImage
 import easygui
 import winreg
 import os
+import requests
+from bs4 import BeautifulSoup
+from packaging import version
+
+#检测更新
+def CheckUpdate(Version):
+    print('\n')
+    print('检查更新中...')
+    print('\n')
+    current_version = Version
+    try:
+        # 设置请求超时时间（单位：秒）
+        response = requests.get(f'https://github.com/BreakPointOo/MultiChannelPacker/releases', timeout=5)
+        response.raise_for_status()  # 如果请求失败，抛出异常
+    except requests.exceptions.RequestException as e:
+        print('获取版本信息失败')
+        print('\n')
+        return
+
+    html_content = response.text
+
+    # 使用 BeautifulSoup 解析 HTML
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # 查找所有版本标签
+    version_tags = soup.find_all('a', {'class': 'Link--primary'})
+    # print('版本信息：')
+    # for tag in version_tags:
+    #         print(tag.text.strip())
+
+    # 解析出最新的版本号
+    latest_version = None
+    for tag in version_tags:
+        if 'v' in tag.text and not 'preview' in tag.text.lower():  # 忽略预览版本
+            latest_version = tag.text.strip()
+            # print(f'最新版本: {latest_version}')
+            break
+    # 比较当前版本和最新版本
+    if latest_version and version.parse(latest_version) > version.parse(current_version):
+
+        print('-------------------------------------------------')
+        print(f'发现新版本: {latest_version}，建议升级')
+        print('-------------------------------------------------')
+        print('\n')
+    else:
+
+        print('-------------------------------------------------')
+        print('当前已是最新版本')
+        print('-------------------------------------------------')
+        print('\n')
+
+
 
 #获取源图片数量
 def GetSourcePicCount():
@@ -182,13 +234,15 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag):
             
 
 if __name__ == '__main__':
+    Version = 'v1.1'
     print('-------------------------------------------------')
-    print('MultiChannelPacker v1.0')
+    print('MultiChannelPacker '+Version)
     print('\n')
     print('本软件免费开源，禁止商业用途')
     print('使用方法及后续更新请访问作者主页：')
     print('https://github.com/BreakPointOo/MultiChannelPacker')
     print('-------------------------------------------------')
+    CheckUpdate(Version)
     SourcePicCount,TargetPicChannelCount = CheckSourcePicCount()
     ChannelOrder,SourcePicTag = GetChannelOrder(SourcePicCount,TargetPicChannelCount)
     SourcePicPath = GetSourcePicPath()
