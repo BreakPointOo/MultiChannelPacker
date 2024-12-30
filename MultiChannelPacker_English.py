@@ -101,13 +101,24 @@ def GetSourcePicList(SourcePicPath, SourcePicTag):
 def MatchSourcePic(SourcePicPath, SourcePicTagList):
     MatchPicList = []
     SourcePicTag = SourcePicTagList[0]
-    BaseName = SourcePicPath.split(SourcePicTag)[0]
-    ExtensionName = SourcePicPath.split(SourcePicTag)[1]
+    LastIndex = SourcePicPath.rfind(SourcePicTag)
+    BaseName = SourcePicPath[:LastIndex]
+    ExtensionName = SourcePicPath[LastIndex:].split(SourcePicTag)[-1]
     for i in range(len(SourcePicTagList)):
+        # Combine the image name
         MatchName = BaseName + SourcePicTagList[i] + ExtensionName
-        MatchPicList.append(MatchName)
+        print(MatchName)
+        # Check if MatchName exists
+        if os.path.exists(MatchName):
+            # print(MatchName)
+            MatchPicList.append(MatchName)
+        else:
+            print('Image does not exist: ' + MatchName)
+            print('Please check if the source image path is correct')
+            # Press any key to exit
+            os.system('pause')
+            exit()
 
-    return MatchPicList
 
 # Composite images according to the channel order
 def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag):
@@ -148,7 +159,8 @@ def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag):
     TargetPicPath = SourcePicPath + '\\Output\\'
     if not os.path.exists(TargetPicPath):
         os.makedirs(TargetPicPath)
-    ImageBaseName = SourcePicList[0].split('\\')[-1].split(SourcePicTag[0])[0]
+    last_index = SourcePicList[0].split('\\')[-1].rfind(SourcePicTag[0])
+    ImageBaseName = SourcePicList[0].split('\\')[-1][:last_index]
     TargetPicPathFull = TargetPicPath + ImageBaseName + '.tga'
 
     print('Output image: ' + TargetPicPathFull)

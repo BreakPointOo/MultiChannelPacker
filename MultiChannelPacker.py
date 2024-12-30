@@ -103,14 +103,28 @@ def MatchSourcePic(SourcePicPath,SourcePicTagList):
     MatchPicList = []
     SourcePicTag= SourcePicTagList[0]
     # print(SourcePicTag)
-    BaseName = SourcePicPath.split(SourcePicTag)[0]
-    ExtensionName = SourcePicPath.split(SourcePicTag)[1]
+    LastIndex = SourcePicPath.rfind(SourcePicTag)
+    BaseName = SourcePicPath[:LastIndex]
+    ExtensionName = SourcePicPath[LastIndex:].split(SourcePicTag)[-1]
+    # print(ExtensionName)
     for i in range(len(SourcePicTagList)):
             #拼合图片名
         MatchName = BaseName + SourcePicTagList[i] + ExtensionName
-        # print(MatchName)
-        MatchPicList.append(MatchName)
-        
+        print(MatchName)
+        #检测MatchName是否存在
+        if os.path.exists(MatchName):
+            # print(MatchName)
+            MatchPicList.append(MatchName)
+        else:
+            print('图片不存在：' + MatchName)
+            print('请检查源图片路径是否正确')
+            #按任意键退出
+            os.system('pause')
+            exit()
+
+
+
+
     return MatchPicList
             
 
@@ -153,9 +167,9 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag):
     TargetPicPath = SourcePicPath + '\\Output\\'
     if not os.path.exists(TargetPicPath):
         os.makedirs(TargetPicPath)
-    ImageBaseName = SourcePicList[0].split('\\')[-1].split(SourcePicTag[0])[0]
-    # print('SourcePicList[0]'+SourcePicList[0])
-    # print('ImageBaseName:'+ImageBaseName)
+    last_index = SourcePicList[0].split('\\')[-1].rfind(SourcePicTag[0])
+    ImageBaseName = SourcePicList[0].split('\\')[-1][:last_index]
+
     TargetPicPathFull = TargetPicPath + ImageBaseName+ '.tga'
 
     print('输出图片：' + TargetPicPathFull)
