@@ -99,8 +99,9 @@ def GetSourcePicList(SourcePicPath,SourcePicTag):
     return SourcePicList
 
 #根据关键字和基础命名匹配一组图片
-def MatchSourcePic(SourcePicPath,SourcePicTagList):
+def MatchSourcePic(SourcePicPath,SourcePicTagList,SourcePicCount):
     MatchPicList = []
+    ALLMatchPicList = []
     SourcePicTag= SourcePicTagList[0]
     # print(SourcePicTag)
     LastIndex = SourcePicPath.rfind(SourcePicTag)
@@ -110,22 +111,22 @@ def MatchSourcePic(SourcePicPath,SourcePicTagList):
     for i in range(len(SourcePicTagList)):
             #拼合图片名
         MatchName = BaseName + SourcePicTagList[i] + ExtensionName
-        print(MatchName)
+        # print(MatchName)
         #检测MatchName是否存在
         if os.path.exists(MatchName):
-            # print(MatchName)
             MatchPicList.append(MatchName)
-        else:
-            print('图片不存在：' + MatchName)
-            print('请检查源图片路径是否正确')
-            #按任意键退出
-            os.system('pause')
-            exit()
+    if len(MatchPicList) == SourcePicCount:
+        for i in MatchPicList:
+            ALLMatchPicList.append(i)
+    #判断是否匹配成功
+    if len(ALLMatchPicList) == SourcePicCount:
+        return ALLMatchPicList
+    else:
+        return None
 
 
 
 
-    return MatchPicList
             
 
 #根据通道顺序合成图片
@@ -182,7 +183,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag):
 
 if __name__ == '__main__':
     print('-------------------------------------------------')
-    print('MultiChannelPacker v0.1 Beta')
+    print('MultiChannelPacker v1.0')
     print('\n')
     print('本软件免费开源，禁止商业用途')
     print('使用方法及后续更新请访问作者主页：')
@@ -195,8 +196,11 @@ if __name__ == '__main__':
 
     for i in SourcePicList:
 
-        MatchPicList = MatchSourcePic(i,SourcePicTag)
-        GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag)
+        MatchPicList = MatchSourcePic(i,SourcePicTag,SourcePicCount)
+        if MatchPicList != None:
+            GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag)
+
+        
 
     os.system('pause')
     

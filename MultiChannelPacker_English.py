@@ -17,9 +17,9 @@ def GetSourcePicCount():
         return GetSourcePicCount()
     return PicCount
 
-# Get the number of channels for the target image
+# Get the number of target image channels
 def GetTargetPicChannelCount():
-    Channel = input('Please enter the number of channels for the target image (3:RGB 4:RGBA): ')
+    Channel = input('Please enter the number of target image channels (3:RGB 4:RGBA): ')
     if Channel != "3" and Channel != "4":
         print('Input error, please re-enter')
         return GetTargetPicChannelCount()
@@ -35,11 +35,11 @@ def CheckSourcePicCount():
         return CheckSourcePicCount()
     return SourcePicCount, TargetPicChannelCount
 
-# Get the channel order of the source images
+# Get the channel order of source images
 def GetChannelOrder(SourcePicCount, TargetPicChannelCount):
     ChannelOrder = []
     SourcePicTag = []
-    print('Please enter the channel order of the source images (RGBA01), 0 is pure black, 1 is pure white, it can be one or more channels, the selected channels will be filled into the output image in sequence, such as R/GR/A0GR')
+    print('Please enter the channel order of source images (RGBA01), 0 is pure black, 1 is pure white, it can be one or more channels, the selected channels will be filled in the output image in order, such as R/GR/A0GR')
     for i in range(SourcePicCount):
         J = i + 1
         ChannelOrder.append(input('Please enter the channels to be used for the %dth image: ' % J))
@@ -52,7 +52,7 @@ def GetChannelOrder(SourcePicCount, TargetPicChannelCount):
     if char_count != TargetPicChannelCount:
         print('The number of channels does not match, please re-enter')
         return GetChannelOrder(SourcePicCount, TargetPicChannelCount)
-    # Prompt the channel order of the target image, which is the nth image's which channel
+    # Prompt the target image channel order, which is the channel of which image
     k = 0
     l = 0
     channel = ['R', 'G', 'B', 'A']
@@ -60,17 +60,17 @@ def GetChannelOrder(SourcePicCount, TargetPicChannelCount):
         k += 1
         for j in i:
             if j.lower() == 'r':
-                print('Using the R channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
+                print('Use the R channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
             elif j.lower() == 'g':
-                print('Using the G channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
+                print('Use the G channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
             elif j.lower() == 'b':
-                print('Using the B channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
+                print('Use the B channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
             elif j.lower() == 'a':
-                print('Using the A channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
+                print('Use the A channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
             elif j == '0':
-                print('Using pure white as the %s channel of the target image' % channel[l])
+                print('Use pure white as the %s channel of the target image' % (channel[l]))
             elif j == '1':
-                print('Using pure black as the %s channel of the target image' % channel[l])
+                print('Use pure black as the %s channel of the target image' % (channel[l]))
             l += 1
     return ChannelOrder, SourcePicTag
 
@@ -80,15 +80,15 @@ def desktop_path():
     path = winreg.QueryValueEx(key, "Desktop")[0]
     return path
 
-# Get the path of the source images
+# Get the source image path
 def GetSourcePicPath():
     msg = ''
-    title = 'Select the directory of source images'
+    title = 'Select the source image directory'
     default = desktop_path()
     SourcePicPath = easygui.diropenbox(msg=msg, title=title, default=default)
     return SourcePicPath
 
-# Traverse the source image path and get the images whose names contain the keyword
+# Traverse the source image path and get the images with the keyword in the name
 def GetSourcePicList(SourcePicPath, SourcePicTag):
     SourcePicList = []
     for root, dirs, files in os.walk(SourcePicPath):
@@ -98,32 +98,28 @@ def GetSourcePicList(SourcePicPath, SourcePicTag):
     return SourcePicList
 
 # Match a set of images according to the keyword and base naming
-def MatchSourcePic(SourcePicPath, SourcePicTagList):
+def MatchSourcePic(SourcePicPath, SourcePicTagList, SourcePicCount):
     MatchPicList = []
+    ALLMatchPicList = []
     SourcePicTag = SourcePicTagList[0]
     LastIndex = SourcePicPath.rfind(SourcePicTag)
     BaseName = SourcePicPath[:LastIndex]
     ExtensionName = SourcePicPath[LastIndex:].split(SourcePicTag)[-1]
     for i in range(len(SourcePicTagList)):
-        # Combine the image name
         MatchName = BaseName + SourcePicTagList[i] + ExtensionName
-        print(MatchName)
-        # Check if MatchName exists
         if os.path.exists(MatchName):
-            # print(MatchName)
             MatchPicList.append(MatchName)
-        else:
-            print('Image does not exist: ' + MatchName)
-            print('Please check if the source image path is correct')
-            # Press any key to exit
-            os.system('pause')
-            exit()
-
+    if len(MatchPicList) == SourcePicCount:
+        for i in MatchPicList:
+            ALLMatchPicList.append(i)
+    if len(ALLMatchPicList) == SourcePicCount:
+        return ALLMatchPicList
+    else:
+        return None
 
 # Composite images according to the channel order
 def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag):
     TargetPicChannel = []
-    # Check if the number of channels and the number of source images match
     if len(ChannelOrder) == len(SourcePicList):
         for j in range(len(ChannelOrder)):
             Image = PILImage.open(SourcePicList[j])
@@ -144,7 +140,7 @@ def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag):
                     TargetPicChannel.append(Image.split()[0].point(lambda i: 0))
                 elif k == '1':
                     TargetPicChannel.append(Image.split()[0].point(lambda i: 255))
-
+    
     # Composite images
     ChannelCount = 0
     for i in ChannelOrder:
@@ -154,13 +150,14 @@ def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag):
         TargetPic = PILImage.merge('RGB', TargetPicChannel)
     elif ChannelCount == 4:
         TargetPic = PILImage.merge('RGBA', TargetPicChannel)
-
+    
     # Get the source image path and save the image in the output directory
     TargetPicPath = SourcePicPath + '\\Output\\'
     if not os.path.exists(TargetPicPath):
         os.makedirs(TargetPicPath)
     last_index = SourcePicList[0].split('\\')[-1].rfind(SourcePicTag[0])
     ImageBaseName = SourcePicList[0].split('\\')[-1][:last_index]
+
     TargetPicPathFull = TargetPicPath + ImageBaseName + '.tga'
 
     print('Output image: ' + TargetPicPathFull)
@@ -168,10 +165,10 @@ def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag):
 
 if __name__ == '__main__':
     print('-------------------------------------------------')
-    print('MultiChannelPacker v0.1 Beta')
+    print('MultiChannelPacker v1.0')
     print('\n')
     print('This software is free and open source, commercial use is prohibited')
-    print('For usage and future updates, please visit the author\'s homepage:')
+    print('For usage and subsequent updates, please visit the author\'s homepage:')
     print('https://github.com/BreakPointOo/MultiChannelPacker')
     print('-------------------------------------------------')
     SourcePicCount, TargetPicChannelCount = CheckSourcePicCount()
@@ -180,7 +177,11 @@ if __name__ == '__main__':
     SourcePicList = GetSourcePicList(SourcePicPath, SourcePicTag[0])
 
     for i in SourcePicList:
-        MatchPicList = MatchSourcePic(i, SourcePicTag)
-        GetTargetPic(ChannelOrder, MatchPicList, SourcePicPath, SourcePicTag)
+
+        MatchPicList = MatchSourcePic(i, SourcePicTag, SourcePicCount)
+        if MatchPicList != None:
+            GetTargetPic(ChannelOrder, MatchPicList, SourcePicPath, SourcePicTag)
+
+        
 
     os.system('pause')
