@@ -197,9 +197,6 @@ def MatchSourcePic(SourcePicPath,SourcePicTagList,SourcePicCount):
         return None
 
 
-
-            
-
 #根据通道顺序合成图片
 def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomName):
     TargetPicChannel = []
@@ -249,10 +246,6 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomNam
     TargetPic.save(TargetPicPathFull)
 
 
-
-
-            
-
 if __name__ == '__main__':
     Version = 'v1.2.0'
     print('-------------------------------------------------')
@@ -276,11 +269,5 @@ if __name__ == '__main__':
         if MatchPicList != None:
             GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag,CustomName)
 
-        
-
+     
     os.system('pause')
-    
-    
-
-
-    
