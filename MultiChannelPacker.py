@@ -168,6 +168,10 @@ def get_image_size(image_path):
     with PILImage.open(image_path) as img:
         return img.size
 
+def is_rgb_image(image_path):
+    with PILImage.open(image_path) as img:
+        return img.mode == 'RGB'
+
 #根据关键字和基础命名匹配一组图片
 def MatchSourcePic(SourcePicPath,SourcePicTagList,SourcePicCount):
     MatchPicList = []
@@ -188,6 +192,9 @@ def MatchSourcePic(SourcePicPath,SourcePicTagList,SourcePicCount):
         # 获取第一张图片的尺寸作为参照
         reference_size = get_image_size(MatchPicList[0])
         for image_path in MatchPicList:
+            if not is_rgb_image(image_path):  # 检查图像是否为RGB格式
+                print("非RGB图像: {}".format(image_path))
+                return None
             if get_image_size(image_path) != reference_size:
                 # 如果有图片尺寸不一致，清空列表并返回None
                 print("图片尺寸不匹配: {}".format(image_path))
@@ -247,7 +254,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomNam
 
 
 if __name__ == '__main__':
-    Version = 'v1.2.0'
+    Version = 'v1.3.0'
     print('-------------------------------------------------')
     print('MultiChannelPacker '+Version)
     print('\n')

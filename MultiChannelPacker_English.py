@@ -37,7 +37,7 @@ def CheckUpdate(Version):
     # Compare current version and latest version
     if latest_version and version.parse(latest_version) > version.parse(current_version):
         print('-------------------------------------------------')
-        print(f'New version found: {latest_version}, it is recommended to upgrade')
+        print(f'New version found: {latest_version}, upgrade recommended')
         print('-------------------------------------------------')
         print('\n')
     else:
@@ -84,7 +84,7 @@ def CheckSourcePicCount():
     SourcePicCount = GetSourcePicCount()
     TargetPicChannelCount = GetTargetPicChannelCount()
     if SourcePicCount > TargetPicChannelCount:
-        print('The number of source images is greater than the number of target image channels, please re-enter')
+        print('Number of source images is greater than the number of target image channels, please re-enter')
         return CheckSourcePicCount()
     return SourcePicCount, TargetPicChannelCount
 
@@ -103,9 +103,9 @@ def GetChannelOrder(SourcePicCount, TargetPicChannelCount):
     for i in ChannelOrder:
         char_count += len(i)
     if char_count != TargetPicChannelCount:
-        print('The number of channels does not match, please re-enter')
+        print('Channel count does not match, please re-enter')
         return GetChannelOrder(SourcePicCount, TargetPicChannelCount)
-    # Prompt the target image channel order, which is the channel of which image
+    # Prompt the target image channel order, which is the nth image's which channel
     k = 0
     l = 0
     channel = ['R', 'G', 'B', 'A']
@@ -121,27 +121,27 @@ def GetChannelOrder(SourcePicCount, TargetPicChannelCount):
             elif j.lower() == 'a':
                 print('Use the A channel of the %dth image as the %s channel of the target image' % (k, channel[l]))
             elif j == '0':
-                print('Use pure white as the %s channel of the target image' % channel[l])
+                print('Use pure white as the %s channel of the target image' % (channel[l]))
             elif j == '1':
-                print('Use pure black as the %s channel of the target image' % channel[l])
+                print('Use pure black channel as the %s channel of the target image' % (channel[l]))
             l += 1
     return ChannelOrder, SourcePicTag
 
-# Get the desktop path
+# Get desktop path
 def desktop_path():
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
     path = winreg.QueryValueEx(key, "Desktop")[0]
     return path
 
-# Get the source image path
+# Get source image path
 def GetSourcePicPath():
     msg = ''
-    title = 'Select Source Image Directory'
+    title = 'Select source image directory'
     default = desktop_path()
     SourcePicPath = easygui.diropenbox(msg=msg, title=title, default=default)
     return SourcePicPath
 
-# Traverse the source image path and get images with keywords in their names
+# Traverse the source image path and get images with names containing keywords
 def GetSourcePicList(SourcePicPath, SourcePicTag):
     SourcePicList = []
     for item in os.listdir(SourcePicPath):
@@ -157,6 +157,10 @@ def get_image_size(image_path):
     with PILImage.open(image_path) as img:
         return img.size
 
+def is_rgb_image(image_path):
+    with PILImage.open(image_path) as img:
+        return img.mode == 'RGB'
+
 # Match a set of images based on keywords and base naming
 def MatchSourcePic(SourcePicPath, SourcePicTagList, SourcePicCount):
     MatchPicList = []
@@ -171,14 +175,18 @@ def MatchSourcePic(SourcePicPath, SourcePicTagList, SourcePicCount):
     if len(MatchPicList) == SourcePicCount:
         reference_size = get_image_size(MatchPicList[0])
         for image_path in MatchPicList:
+            if not is_rgb_image(image_path):  # Check if the image is in RGB format
+                print("Non-RGB image: {}".format(image_path))
+                return None
             if get_image_size(image_path) != reference_size:
+                # If there is an inconsistent image size, clear the list and return None
                 print("Image size mismatch: {}".format(image_path))
                 return None
         return MatchPicList
     else:
         return None
 
-# Combine images according to the channel order
+# Combine images according to channel order
 def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag, CustomName):
     TargetPicChannel = []
     if len(ChannelOrder) == len(SourcePicList):
@@ -212,7 +220,7 @@ def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag, Custo
     elif ChannelCount == 4:
         TargetPic = PILImage.merge('RGBA', TargetPicChannel)
 
-    # Get the source image path and save the image in the output directory
+    # Get source image path, save the image in the output directory
     TargetPicPath = SourcePicPath + '\\Output\\'
     if not os.path.exists(TargetPicPath):
         os.makedirs(TargetPicPath)
@@ -227,12 +235,12 @@ def GetTargetPic(ChannelOrder, SourcePicList, SourcePicPath, SourcePicTag, Custo
 
 
 if __name__ == '__main__':
-    Version = 'v1.2.0'
+    Version = 'v1.3.0'
     print('-------------------------------------------------')
     print('MultiChannelPacker ' + Version)
     print('\n')
     print('This software is free and open source, commercial use is prohibited')
-    print('For usage and subsequent updates, please visit the author\'s homepage:')
+    print('For usage and future updates, please visit the author\'s homepage:')
     print('https://github.com/BreakPointOo/MultiChannelPacker')
     print('-------------------------------------------------')
     CheckUpdate(Version)
