@@ -78,6 +78,15 @@ def GetTargetPicChannelCount():
     Channel = int(Channel)
     return Channel
 
+#输入自定义命名
+def GetCustomName():
+    CustomName = input('请输入生成图片的自定义后缀名，如_N/01，如果不需要直接按回车跳过此步骤)：')
+    if CustomName != '':
+        return CustomName
+    else:
+        return None
+
+
 #判断源图片数量是否大于目标图片通道数
 def CheckSourcePicCount():
     SourcePicCount = GetSourcePicCount()
@@ -144,16 +153,24 @@ def GetSourcePicPath():
 #遍历源图片路径，获取命名包含关键字的图片
 def GetSourcePicList(SourcePicPath,SourcePicTag):
     SourcePicList = []
-    for root,dirs,files in os.walk(SourcePicPath):
-        for file in files:
-            if file.find(SourcePicTag) != -1:
-                SourcePicList.append(os.path.join(root,file))
+    for item in os.listdir(SourcePicPath):
+        # 拼接完整路径
+        full_path = os.path.join(SourcePicPath, item)
+        # 检查是否是文件并且包含SourcePicTag
+        if os.path.isfile(full_path) and item.find(SourcePicTag) != -1:
+            SourcePicList.append(full_path)
+    # for i in range(len(SourcePicList)):
+    #     print(SourcePicList[i])
     return SourcePicList
+
+def get_image_size(image_path):
+    """获取图片尺寸"""
+    with PILImage.open(image_path) as img:
+        return img.size
 
 #根据关键字和基础命名匹配一组图片
 def MatchSourcePic(SourcePicPath,SourcePicTagList,SourcePicCount):
     MatchPicList = []
-    ALLMatchPicList = []
     SourcePicTag= SourcePicTagList[0]
     # print(SourcePicTag)
     LastIndex = SourcePicPath.rfind(SourcePicTag)
@@ -168,21 +185,23 @@ def MatchSourcePic(SourcePicPath,SourcePicTagList,SourcePicCount):
         if os.path.exists(MatchName):
             MatchPicList.append(MatchName)
     if len(MatchPicList) == SourcePicCount:
-        for i in MatchPicList:
-            ALLMatchPicList.append(i)
-    #判断是否匹配成功
-    if len(ALLMatchPicList) == SourcePicCount:
-        return ALLMatchPicList
+        # 获取第一张图片的尺寸作为参照
+        reference_size = get_image_size(MatchPicList[0])
+        for image_path in MatchPicList:
+            if get_image_size(image_path) != reference_size:
+                # 如果有图片尺寸不一致，清空列表并返回None
+                print("图片尺寸不匹配: {}".format(image_path))
+                return None
+        return MatchPicList
     else:
         return None
-
 
 
 
             
 
 #根据通道顺序合成图片
-def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag):
+def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomName):
     TargetPicChannel = []
     #判断通道数量和源图片数量是否匹配
     if len(ChannelOrder) == len(SourcePicList):
@@ -222,7 +241,8 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag):
         os.makedirs(TargetPicPath)
     last_index = SourcePicList[0].split('\\')[-1].rfind(SourcePicTag[0])
     ImageBaseName = SourcePicList[0].split('\\')[-1][:last_index]
-
+    if CustomName != None:
+        ImageBaseName = ImageBaseName + CustomName
     TargetPicPathFull = TargetPicPath + ImageBaseName+ '.tga'
 
     print('输出图片：' + TargetPicPathFull)
@@ -234,7 +254,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag):
             
 
 if __name__ == '__main__':
-    Version = 'v1.1'
+    Version = 'v1.2.0'
     print('-------------------------------------------------')
     print('MultiChannelPacker '+Version)
     print('\n')
@@ -245,6 +265,8 @@ if __name__ == '__main__':
     CheckUpdate(Version)
     SourcePicCount,TargetPicChannelCount = CheckSourcePicCount()
     ChannelOrder,SourcePicTag = GetChannelOrder(SourcePicCount,TargetPicChannelCount)
+
+    CustomName = GetCustomName()
     SourcePicPath = GetSourcePicPath()
     SourcePicList = GetSourcePicList(SourcePicPath,SourcePicTag[0])
 
@@ -252,7 +274,7 @@ if __name__ == '__main__':
 
         MatchPicList = MatchSourcePic(i,SourcePicTag,SourcePicCount)
         if MatchPicList != None:
-            GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag)
+            GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag,CustomName)
 
         
 
