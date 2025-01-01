@@ -7,12 +7,13 @@ from bs4 import BeautifulSoup
 from packaging import version
 import threading
 import msvcrt
+import webbrowser
 
 #检测更新
 def CheckUpdate(Version):
-    print('\n')
+    # print('\n')
     print('检查更新中...')
-    print('\n')
+    # print('\n')
     current_version = Version
     try:
         # 设置请求超时时间（单位：秒）
@@ -44,15 +45,20 @@ def CheckUpdate(Version):
     # 比较当前版本和最新版本
     if latest_version and version.parse(latest_version) > version.parse(current_version):
 
-        print('-------------------------------------------------')
+        # print('-------------------------------------------------')
         print(f'发现新版本: {latest_version}，建议升级')
-        print('-------------------------------------------------')
+        # print('-------------------------------------------------')
+        
+        user_input = input('输入y打开更新页面，按回车取消: ')
+        if user_input.lower() == 'y':
+            webbrowser.open(f'https://github.com/BreakPointOo/MultiChannelPacker/releases/tag/{latest_version}')
         print('\n')
+
     else:
 
-        print('-------------------------------------------------')
+        # print('-------------------------------------------------')
         print('当前已是最新版本')
-        print('-------------------------------------------------')
+        # print('-------------------------------------------------')
         print('\n')
 
 
@@ -256,7 +262,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomNam
 
 
 if __name__ == '__main__':
-    Version = 'v1.5.0'
+    Version = 'v1.5.1'
     print('-------------------------------------------------')
     print('MultiChannelPacker '+Version)
     print('\n')
