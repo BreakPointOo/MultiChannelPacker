@@ -14,6 +14,10 @@ A convenient and quick tool for batch extracting channels from multiple images a
 
   When using channels from multiple images, the naming of the images must be related. Except for the different keywords, the naming before the keywords must be the same, such as Image_*.
 
+- 源图片的尺寸和图片格式必须一致
+
+  The size and format of the source images must be consistent.
+  
 - 目前只能输出tga格式，但是输入的图片可以是其他格式
 
   Currently, only TGA format can be output, but the input images can be in other formats.

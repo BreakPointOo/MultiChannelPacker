@@ -5,6 +5,8 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from packaging import version
+import threading
+import msvcrt
 
 #检测更新
 def CheckUpdate(Version):
@@ -254,7 +256,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomNam
 
 
 if __name__ == '__main__':
-    Version = 'v1.3.0'
+    Version = 'v1.5.0'
     print('-------------------------------------------------')
     print('MultiChannelPacker '+Version)
     print('\n')
@@ -270,11 +272,26 @@ if __name__ == '__main__':
     SourcePicPath = GetSourcePicPath()
     SourcePicList = GetSourcePicList(SourcePicPath,SourcePicTag[0])
 
+    # for i in SourcePicList:
+
+    #     MatchPicList = MatchSourcePic(i,SourcePicTag,SourcePicCount)
+    #     if MatchPicList != None:
+    #         GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag,CustomName)
+    threads = []
     for i in SourcePicList:
+        MatchPicList = MatchSourcePic(i, SourcePicTag, SourcePicCount)
+        if MatchPicList is not None:
+            # 创建并启动新线程
+            thread = threading.Thread(target=GetTargetPic, args=(ChannelOrder, MatchPicList, SourcePicPath, SourcePicTag, CustomName))
+            thread.start()
+            threads.append(thread)
 
-        MatchPicList = MatchSourcePic(i,SourcePicTag,SourcePicCount)
-        if MatchPicList != None:
-            GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag,CustomName)
-
-     
-    os.system('pause')
+    # 等待所有线程完成
+    for thread in threads:
+        thread.join()
+    #打开输出文件夹
+    os.system('explorer.exe ' + SourcePicPath + '\\Output')
+    #按任意键退出
+    print('按任意键退出...')
+    msvcrt.getch()
+    exit(0)  # 退出程序
