@@ -152,10 +152,12 @@ def desktop_path():
 
 #获取源图片路径
 def GetSourcePicPath():
+    print('请选择源图片目录')
     msg = ''
     title = '选择源图片目录'
     default = desktop_path()
     SourcePicPath = easygui.diropenbox(msg = msg,title = title ,default = default)
+    print('源图片目录为：' + SourcePicPath)
     return SourcePicPath
 
 #遍历源图片路径，获取命名包含关键字的图片
@@ -262,7 +264,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomNam
 
 
 if __name__ == '__main__':
-    Version = 'v1.5.2'
+    Version = 'v1.5.3'
     print('-------------------------------------------------')
     print('MultiChannelPacker '+Version)
     print('\n')
@@ -283,6 +285,7 @@ if __name__ == '__main__':
     #     MatchPicList = MatchSourcePic(i,SourcePicTag,SourcePicCount)
     #     if MatchPicList != None:
     #         GetTargetPic(ChannelOrder,MatchPicList,SourcePicPath,SourcePicTag,CustomName)
+    print('-------------------------------------------------')
     threads = []
     for i in SourcePicList:
         MatchPicList = MatchSourcePic(i, SourcePicTag, SourcePicCount)
