@@ -262,7 +262,7 @@ def GetTargetPic(ChannelOrder,SourcePicList,SourcePicPath,SourcePicTag,CustomNam
 
 
 if __name__ == '__main__':
-    Version = 'v1.5.1'
+    Version = 'v1.5.2'
     print('-------------------------------------------------')
     print('MultiChannelPacker '+Version)
     print('\n')
@@ -300,4 +300,4 @@ if __name__ == '__main__':
     #按任意键退出
     print('按任意键退出...')
     msvcrt.getch()
-    exit(0)  # 退出程序
+    os._exit(0)
