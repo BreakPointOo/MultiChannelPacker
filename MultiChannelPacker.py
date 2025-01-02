@@ -299,6 +299,7 @@ if __name__ == '__main__':
     for thread in threads:
         thread.join()
     #打开输出文件夹
+    print('-------------------------------------------------')
     os.system('explorer.exe ' + SourcePicPath + '\\Output')
     #按任意键退出
     print('按任意键退出...')
